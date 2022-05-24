@@ -1,0 +1,6 @@
+{
+    "name":"multijson",
+    "version":"0.0.2",
+    "description":"why only put 1 object by file ? that's a lot of files",
+    "type":"module"
+}
