@@ -1,5 +1,18 @@
-const fs = require("fs");
-function searchObject(src, value, property = "id") {
+import fs from "fs";
+function manipFileByChunks(src, func, startValue = undefined) {
+    var iStr = fs.createReadStream(src);
+    iStr.setEncoding("utf-8");
+    let returnValue = startValue;
+    return new Promise((resolve, reject) => {
+        iStr.on('data', function (c) {
+            returnValue = func(returnValue, c);
+        })
+        iStr.on('end', () => {
+            resolve(returnValue);
+        })
+    })
+}
+async function searchObject(src, value, property = "id") {
     var lf = '"' + property + '":';
     switch (typeof value) {
         case "string": lf += '"' + value + '"';
@@ -9,19 +22,20 @@ function searchObject(src, value, property = "id") {
         default: return null;
     }
     //lf = what the function must look for in the text
-    var iStr = fs.createReadStream(src);
-    iStr.setEncoding("utf-8");
-    let retVal;
-    return new Promise((resolve, reject) => {
-        iStr.on('data', function (chunk) {
-            let timeSaver = lf.length;
-            let scanStart = chunk.indexOf(lf);
+    let retVal = await manipFileByChunks(src, (r, c) => {
+        if (r != undefined) {
+            return r
+        }
+        else {
+            let scanStart = c.indexOf(lf);
+            console.log(lf);
             if (scanStart != -1) {
+                let timeSaver = lf.length;
                 let scan = scanStart;
                 let bracketCounter = 1;
                 while (bracketCounter != 0) {
                     scan--;
-                    switch (chunk[scan]) {
+                    switch (c[scan]) {
                         case "{": bracketCounter--; break;
                         case "}": bracketCounter++; break;
                     }
@@ -30,26 +44,28 @@ function searchObject(src, value, property = "id") {
                 scan = scanStart + timeSaver;
                 bracketCounter = 1;
                 while (bracketCounter != 0) {
-                    switch (chunk[scan]) {
+                    switch (c[scan]) {
                         case "{": bracketCounter++; break;
                         case "}": bracketCounter--; break;
                     }
                     scan++;
                 }
                 let objectEnd = scan;
-                retVal = JSON.parse(chunk.substring(objectStart, objectEnd));
+                r = JSON.parse(c.substring(objectStart, objectEnd));
+                return r;
             }
-        })
-        iStr.on('end', () => {
-            resolve(retVal);
-        })
-    })
+            else {
+                return undefined;
+            }
+        }
+    });
+    return retVal;
 }
 export { searchObject }
 async function main() {
     let timer = Date.now();
-    let search = await searchObject("test.txt", "meme");
-    console.log(search);
+    let textFile = await searchObject("test.txt", "1");
+    console.log(textFile);
     console.log(Date.now() - timer);
 }
 main();
