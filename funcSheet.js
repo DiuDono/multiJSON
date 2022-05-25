@@ -1,5 +1,5 @@
 import fs from "fs";
-function manipFileByChunks(src, func, startValue = undefined) {
+function manipFileByChunks(src, func, startValue = undefined) {//just a shortcut for other functions
     var iStr = fs.createReadStream(src);
     iStr.setEncoding("utf-8");
     let returnValue = startValue;
@@ -12,6 +12,13 @@ function manipFileByChunks(src, func, startValue = undefined) {
         })
     })
 }
+async function readFile(src) {//it reads a file
+    return manipFileByChunks(src, (r, c) => {
+        r += c;
+        return r;
+    }, "");
+}
+//search a JSON object in a (txt) file, given the value of a property fo that object
 async function searchObject(src, value, property = "id") {
     var lf = '"' + property + '":';
     switch (typeof value) {
@@ -28,7 +35,6 @@ async function searchObject(src, value, property = "id") {
         }
         else {
             let scanStart = c.indexOf(lf);
-            console.log(lf);
             if (scanStart != -1) {
                 let timeSaver = lf.length;
                 let scan = scanStart;
@@ -61,11 +67,50 @@ async function searchObject(src, value, property = "id") {
     });
     return retVal;
 }
-export { searchObject }
+//search JSON object in a string, same requirements as searchObject
+async function searchObjectV(txt, value, property = "id") {
+    var lf = '"' + property + '":';
+    switch (typeof value) {
+        case "string": lf += '"' + value + '"';
+            break;
+        case "number": lf += value.toString();
+            break;
+        default: return null;
+    }
+    return new Promise((res, rej) => {
+        let epsilon = txt.indexOf(lf);
+        if (epsilon != -1) {
+            let scan = epsilon;
+            let bracketCounter = 1;
+            while (bracketCounter != 0) {
+                scan--;
+                switch (txt[scan]) {
+                    case "{": bracketCounter--; break;
+                    case "}": bracketCounter++; break;
+                }
+            }
+            let objectStart = scan;
+            scan = epsilon + lf.length;
+            bracketCounter = 1;
+            while (bracketCounter != 0) {
+                switch (txt[scan]) {
+                    case "{": bracketCounter++; break;
+                    case "}": bracketCounter--; break;
+                }
+                scan++;
+            }
+            let objectEnd = scan;
+            let r = JSON.parse(txt.substring(objectStart, objectEnd));
+            res(r);
+        }
+    })
+}
+export default { manipFileByChunks, readFile, searchObject }
 async function main() {
     let timer = Date.now();
-    let textFile = await searchObject("test.txt", "1");
-    console.log(textFile);
+    let textFile = await readFile("test.txt");
+    let item = await searchObjectV(textFile,"11");
+    console.log(item);
     console.log(Date.now() - timer);
 }
 main();
