@@ -105,12 +105,27 @@ async function searchObjectV(txt, value, property = "id") {
         }
     })
 }
-export default { manipFileByChunks, readFile, searchObject, searchObjectV }
+async function changeObject(src,id,newObject) {
+    let txt = await readFile(src);
+    let lf = '"id":';
+    switch (typeof id) {
+        case "string": lf += '"' + id + '"';
+            break;
+        case "number": lf += id.toString();
+            break;
+        default: return null;
+    }
+    let getout = await searchObjectV(txt,id);
+    getout = JSON.stringify(getout);
+    txt = txt.slice(0,txt.indexOf(getout)-2)+txt.slice(txt.indexOf(getout)+getout.length);
+    txt += "\n"+JSON.stringify(newObject);
+    let pen = fs.createWriteStream("./test.txt");
+    pen.write(txt);
+}
+export default { manipFileByChunks, readFile, searchObject, searchObjectV, changeObject }
 async function main() {
     let timer = Date.now();
-    let textFile = await readFile("test.txt");
-    let item = await searchObjectV(textFile,"11");
-    console.log(item);
+    await changeObject('test.txt',"11",{id:"11",pr1:"bas",pr2:51});
     console.log(Date.now() - timer);
 }
 main();
