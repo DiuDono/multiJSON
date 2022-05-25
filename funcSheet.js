@@ -105,7 +105,7 @@ async function searchObjectV(txt, value, property = "id") {
         }
     })
 }
-export default { manipFileByChunks, readFile, searchObject }
+export default { manipFileByChunks, readFile, searchObject, searchObjectV }
 async function main() {
     let timer = Date.now();
     let textFile = await readFile("test.txt");
