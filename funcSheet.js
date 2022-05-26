@@ -104,8 +104,9 @@ async function searchObjectV(txt, value, property = "id") {
         }
     })
 }
-async function changeObject(src,id,newObject) {
+async function updateObject(src,newObject) {
     let txt = await readFile(src);
+    let id = newObject.id;
     let lf = '"id":';
     switch (typeof id) {
         case "string": lf += '"' + id + '"';
@@ -116,7 +117,10 @@ async function changeObject(src,id,newObject) {
     }
     let getout = await searchObjectV(txt,id);
     getout = JSON.stringify(getout);
-    txt = txt.slice(0,txt.indexOf(getout)-2)+txt.slice(txt.indexOf(getout)+getout.length);
+    let getoutIndex = txt.indexOf(getout);
+    if(getoutIndex != -1) {
+    txt = txt.slice(0,getoutIndex-2)+txt.slice(getoutIndex+getout.length);
+    }
     txt += "\n"+JSON.stringify(newObject);
     let pen = fs.createWriteStream("./test.txt");
     pen.write(txt);
