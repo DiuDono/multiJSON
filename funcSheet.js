@@ -29,7 +29,7 @@ async function searchObject(src, value, property = "id") {
         default: return null;
     }
     //lf = what the function must look for in the text
-    let retVal = await manipFileByChunks(src, (r, c) => {
+    return manipFileByChunks(src, (r, c) => {
         if (r != undefined) {
             return r
         }
@@ -65,7 +65,6 @@ async function searchObject(src, value, property = "id") {
             }
         }
     });
-    return retVal;
 }
 //search JSON object in a string, same requirements as searchObject
 async function searchObjectV(txt, value, property = "id") {
