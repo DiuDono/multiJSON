@@ -128,7 +128,16 @@ async function updateObject(src,newObject) {
 export default { manipFileByChunks, readFile, searchObject, searchObjectV, updateObject }
 async function main() {
     let timer = Date.now();
-    await changeObject('test.txt',"11",{id:"11",pr1:"bas",pr2:51});
+    let x1 = searchObject('test.txt',"12");
+    let x2 = searchObject('test.txt',"2d");
+    let x3 = searchObject('test.txt',"18");
+    let x4 = searchObject('test.txt',"6");
+    let x5 = await searchObject('test.txt',"31");
+    console.log(x1);
+    console.log(x2);
+    console.log(x3);
+    console.log(x4);
+    console.log(x5);
     console.log(Date.now() - timer);
 }
 main();
