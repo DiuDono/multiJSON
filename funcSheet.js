@@ -125,7 +125,7 @@ async function updateObject(src,newObject) {
     let pen = fs.createWriteStream("./test.txt");
     pen.write(txt);
 }
-export default { manipFileByChunks, readFile, searchObject, searchObjectV, changeObject }
+export default { manipFileByChunks, readFile, searchObject, searchObjectV, updateObject }
 async function main() {
     let timer = Date.now();
     await changeObject('test.txt',"11",{id:"11",pr1:"bas",pr2:51});
