@@ -2,5 +2,19 @@
     "name":"multijson",
     "version":"1.0.0",
     "description":"why only put 1 object per file ? that's a lot of files if u got lot of json",
-    "type":"module"
+    "keywords":["js","JSON","save file","file","multiJSON","multijson"],
+    "homepage": "https://github.com/DiuDono/multiJSON#readme",
+    "bugs": {
+        "url": "https://github.com/DiuDono/multiJSON/issues"
+    },
+    "author": {
+        "name": "Samuel Dubois"
+    },
+    "main": "funcSheet.js",
+    "license": "AGPL-3.0-or-later",
+    "type":"module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DiuDono/multiJSON"
+    }
 }
