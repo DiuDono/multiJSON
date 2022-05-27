@@ -1,6 +1,6 @@
 {
-    "name":"multijson",
-    "version":"1.0.0",
+    "name":"polyjson",
+    "version":"1.0.1",
     "description":"why only put 1 object per file ? that's a lot of files if u got lot of json",
     "keywords":["js","JSON","save file","file","multiJSON","multijson"],
     "homepage": "https://github.com/DiuDono/multiJSON#readme",
