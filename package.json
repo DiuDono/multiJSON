@@ -1,6 +1,6 @@
 {
     "name":"multijson",
-    "version":"0.0.2",
+    "version":"1.0.0",
     "description":"why only put 1 object per file ? that's a lot of files if u got lot of json",
     "type":"module"
 }

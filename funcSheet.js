@@ -1,5 +1,5 @@
 import fs from "fs";
-function manipFileByChunks(src, func, startValue = undefined) {//just a shortcut for other functions
+async function manipFileByChunks(src, func, startValue = undefined) {//just a shortcut for other functions
     var iStr = fs.createReadStream(src);
     iStr.setEncoding("utf-8");
     let returnValue = startValue;
@@ -102,42 +102,42 @@ async function searchObjectV(txt, value, property = "id") {
             let r = JSON.parse(txt.substring(objectStart, objectEnd));
             res(r);
         }
+        else {
+            res(undefined);
+        }
     })
 }
-async function updateObject(src,newObject) {
+async function updateObject(src, newObjects) {
     let txt = await readFile(src);
-    let id = newObject.id;
-    let lf = '"id":';
-    switch (typeof id) {
-        case "string": lf += '"' + id + '"';
-            break;
-        case "number": lf += id.toString();
-            break;
-        default: return null;
-    }
-    let getout = await searchObjectV(txt,id);
+    let id = newObjects.id;
+    let getout = await searchObjectV(txt, id);
     getout = JSON.stringify(getout);
     let getoutIndex = txt.indexOf(getout);
-    if(getoutIndex != -1) {
-    txt = txt.slice(0,getoutIndex-2)+txt.slice(getoutIndex+getout.length);
+    if (getoutIndex != -1) {
+        txt = txt.slice(0, getoutIndex - 2) + txt.slice(getoutIndex + getout.length);
     }
-    txt += "\n"+JSON.stringify(newObject);
-    let pen = fs.createWriteStream("./test.txt");
-    pen.write(txt);
+    txt += "\n" + JSON.stringify(newObjects);
+    return new Promise((res) => {
+        fs.writeFile(src, txt, () => res(true));
+    })
 }
-export default { manipFileByChunks, readFile, searchObject, searchObjectV, updateObject }
-async function main() {
-    let timer = Date.now();
-    let x1 = searchObject('test.txt',"12");
-    let x2 = searchObject('test.txt',"2d");
-    let x3 = searchObject('test.txt',"18");
-    let x4 = searchObject('test.txt',"6");
-    let x5 = await searchObject('test.txt',"31");
-    console.log(x1);
-    console.log(x2);
-    console.log(x3);
-    console.log(x4);
-    console.log(x5);
-    console.log(Date.now() - timer);
+async function updateObjects(src, newObjects) {
+    if(Array.isArray(newObjects)) {
+    let txt = await readFile(src);
+    for (var i in newObjects) {
+        let id = newObjects[i].id;
+        let getout = await searchObjectV(txt, id);
+        getout = JSON.stringify(getout);
+        let getoutIndex = txt.indexOf(getout);
+        if (getoutIndex != -1) {
+            txt = txt.slice(0, getoutIndex - 1) + txt.slice(getoutIndex + getout.length);
+        }
+        txt += "\n" + JSON.stringify(newObjects[i]);
+    }
+    return new Promise((res) => {
+        fs.writeFile(src, txt, () => res(true));
+    })
+    }
+    else {
 }
 main();
