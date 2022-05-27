@@ -139,5 +139,9 @@ async function updateObjects(src, newObjects) {
     })
     }
     else {
+        return new Promise((res) => {
+            res(false);
+        })
+    }
 }
-main();
+export default { manipFileByChunks, readFile, searchObject, searchObjectV, updateObject, updateObjects }
