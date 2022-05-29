@@ -113,8 +113,11 @@ async function updateObject(src, newObjects) {
     let getout = await searchObjectV(txt, id);
     getout = JSON.stringify(getout);
     let getoutIndex = txt.indexOf(getout);
-    if (getoutIndex != -1) {
-        txt = txt.slice(0, getoutIndex - 2) + txt.slice(getoutIndex + getout.length);
+    if (getoutIndex >= 1) {
+        txt = txt.slice(0, getoutIndex - 1) + txt.slice(getoutIndex + getout.length);
+    }
+    else if (getoutIndex == 0) {
+        txt = txt.slice(getout.length);
     }
     txt += "\n" + JSON.stringify(newObjects);
     return new Promise((res) => {
@@ -122,21 +125,26 @@ async function updateObject(src, newObjects) {
     })
 }
 async function updateObjects(src, newObjects) {
-    if(Array.isArray(newObjects)) {
-    let txt = await readFile(src);
-    for (var i in newObjects) {
-        let id = newObjects[i].id;
-        let getout = await searchObjectV(txt, id);
-        getout = JSON.stringify(getout);
-        let getoutIndex = txt.indexOf(getout);
-        if (getoutIndex != -1) {
-            txt = txt.slice(0, getoutIndex - 1) + txt.slice(getoutIndex + getout.length);
+    if (Array.isArray(newObjects)) {
+        let txt = await readFile(src);
+        for (var i in newObjects) {
+            let id = newObjects[i].id;
+            let getout = await searchObjectV(txt, id);
+            getout = JSON.stringify(getout);
+            let getoutIndex = txt.indexOf(getout);
+            if (getoutIndex >= 1) {
+                txt = txt.slice(0, getoutIndex - 1) + txt.slice(getoutIndex + getout.length);
+            }
+            else if (getoutIndex == 0) {
+                txt = txt.slice(getout.length);
+            } if (getoutIndex != -1) {
+                txt = txt.slice(0, getoutIndex - 1) + txt.slice(getoutIndex + getout.length);
+            }
+            txt += "\n" + JSON.stringify(newObjects[i]);
         }
-        txt += "\n" + JSON.stringify(newObjects[i]);
-    }
-    return new Promise((res) => {
-        fs.writeFile(src, txt, () => res(true));
-    })
+        return new Promise((res) => {
+            fs.writeFile(src, txt, () => res(true));
+        })
     }
     else {
         return new Promise((res) => {
